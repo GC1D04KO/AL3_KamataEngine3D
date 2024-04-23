@@ -3,8 +3,10 @@
 #include <cassert>
 
 GameScene::GameScene() { 
+
 	delete sprite_;
 
+	delete model_;
 }
 
 GameScene::~GameScene() {}
@@ -18,7 +20,19 @@ void GameScene::Initialize() {
 	textureHandle_ = TextureManager::Load("mario.jpg");
 
 	sprite_ = Sprite::Create(textureHandle_, {100, 50});
+
+
+	model_ = Model::Create();
+
+	//ウールドトランスフォーム 初期化
+	worldTransform_.Initialize();
+
+
+	////ビュープロジェクション初期化
+	viewProjection_.Initialize();
+
 }
+
 
 void GameScene::Update() {
 
@@ -61,6 +75,10 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
+
+	//3Dモデル描画
+	model_->Draw(worldTransform_, viewProjection_, textureHandle_);
+
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
