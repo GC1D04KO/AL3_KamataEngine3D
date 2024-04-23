@@ -2,7 +2,10 @@
 #include "TextureManager.h"
 #include <cassert>
 
-GameScene::GameScene() {}
+GameScene::GameScene() { 
+	delete sprite_;
+
+}
 
 GameScene::~GameScene() {}
 
@@ -11,11 +14,26 @@ void GameScene::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
+
+	textureHandle_ = TextureManager::Load("mario.jpg");
+
+	sprite_ = Sprite::Create(textureHandle_, {100, 50});
 }
 
-void GameScene::Update() {}
+void GameScene::Update() {
+
+	Vector2 position = sprite_->GetPosition();
+
+	position.x += 2.0f;
+	position.y += 1.0f;
+
+
+  sprite_->SetPosition(position);
+
+}
 
 void GameScene::Draw() {
+
 
 	// コマンドリストの取得
 	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
@@ -27,6 +45,8 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
+	
+	sprite_->Draw();
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -59,3 +79,4 @@ void GameScene::Draw() {
 
 #pragma endregion
 }
+
