@@ -2,7 +2,14 @@
 #include "TextureManager.h"
 #include <cassert>
 
-GameScene::GameScene() {}
+GameScene::GameScene() { 
+
+	/*delete sprite_;*/
+
+	delete model_;
+
+    delete debugCamera_;
+}
 
 GameScene::~GameScene() {}
 
@@ -11,11 +18,37 @@ void GameScene::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
+
+	textureHandle_ = TextureManager::Load("mario.jpg");
+
+	/*sprite_ = Sprite::Create(textureHandle_, {});*/
+
+
+	model_ = Model::Create();
+
+	//ウールドトランスフォーム 初期化
+	worldTransform_.Initialize();
+
+
+	////ビュープロジェクション初期化
+	viewProjection_.Initialize();
+
+
+ //デバッグカメラの生成
+	debugCamera_ =new DebugCamera(400,400);
+	
 }
 
-void GameScene::Update() {}
+
+void GameScene::Update() {
+
+	debugCamera_->Update();
+
+
+}
 
 void GameScene::Draw() {
+
 
 	// コマンドリストの取得
 	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
@@ -27,6 +60,8 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
+	
+	/*sprite_->Draw();*/
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -41,6 +76,13 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
+
+	//3Dモデル描画
+
+
+	/*model_->Draw(worldTransform_, viewProjection_, textureHandle_);*/
+	model_->Draw(worldTransform_, debugCamera_->GetViewProjection(), textureHandle_);
+
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
@@ -59,3 +101,4 @@ void GameScene::Draw() {
 
 #pragma endregion
 }
+
