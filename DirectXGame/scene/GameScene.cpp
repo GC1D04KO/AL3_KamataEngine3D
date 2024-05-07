@@ -4,9 +4,11 @@
 
 GameScene::GameScene() { 
 
-	delete sprite_;
+	/*delete sprite_;*/
 
 	delete model_;
+
+    delete debugCamera_;
 }
 
 GameScene::~GameScene() {}
@@ -19,7 +21,7 @@ void GameScene::Initialize() {
 
 	textureHandle_ = TextureManager::Load("mario.jpg");
 
-	sprite_ = Sprite::Create(textureHandle_, {100, 50});
+	/*sprite_ = Sprite::Create(textureHandle_, {});*/
 
 
 	model_ = Model::Create();
@@ -31,18 +33,17 @@ void GameScene::Initialize() {
 	////ビュープロジェクション初期化
 	viewProjection_.Initialize();
 
+
+ //デバッグカメラの生成
+	debugCamera_ =new DebugCamera(400,400);
+	
 }
 
 
 void GameScene::Update() {
 
-	Vector2 position = sprite_->GetPosition();
+	debugCamera_->Update();
 
-	position.x += 2.0f;
-	position.y += 1.0f;
-
-
-  sprite_->SetPosition(position);
 
 }
 
@@ -60,7 +61,7 @@ void GameScene::Draw() {
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
 	
-	sprite_->Draw();
+	/*sprite_->Draw();*/
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -77,7 +78,10 @@ void GameScene::Draw() {
 	/// </summary>
 
 	//3Dモデル描画
-	model_->Draw(worldTransform_, viewProjection_, textureHandle_);
+
+
+	/*model_->Draw(worldTransform_, viewProjection_, textureHandle_);*/
+	model_->Draw(worldTransform_, debugCamera_->GetViewProjection(), textureHandle_);
 
 
 	// 3Dオブジェクト描画後処理
