@@ -2,18 +2,43 @@
 #include "TextureManager.h"
 #include <cassert>
 
-GameScene::GameScene() {}
+GameScene::GameScene() { 
+}
 
-GameScene::~GameScene() {}
+GameScene::~GameScene() { 
+	delete player_;
+	delete model_;
+}
 
 void GameScene::Initialize() {
 
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
+
+
+	textureHandle_ = TextureManager::Load("uvChecker.png");
+
+	model_ = Model::Create();
+
+
+	// 自キャラの生成
+	player_ = new Player;
+
+   // 自キャラの初期化
+	player_ ->Initialize(model_, textureHandle_, &viewProjection_);
+	
+	worldTransform_.Initialize();
+	viewProjection_.Initialize();
 }
 
-void GameScene::Update() {}
+void GameScene::Update() {
+	//自キャラの更新
+	player_->Update();
+
+
+
+}
 
 void GameScene::Draw() {
 
@@ -41,6 +66,7 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
+	player_->Draw();
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
@@ -50,12 +76,16 @@ void GameScene::Draw() {
 	// 前景スプライト描画前処理
 	Sprite::PreDraw(commandList);
 
+	
+
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
+
+	//自キャラの描画
 
 #pragma endregion
 }
