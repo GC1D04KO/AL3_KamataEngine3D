@@ -7,6 +7,9 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include<vector>
+#include"DebugCamera.h"
+
 
 /// <summary>
 /// ゲームシーン
@@ -18,6 +21,7 @@ public: // メンバ関数
 	/// コンストクラタ
 	/// </summary>
 	GameScene();
+	
 
 	/// <summary>
 	/// デストラクタ
@@ -39,10 +43,30 @@ public: // メンバ関数
 	/// </summary>
 	void Draw();
 
+	
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
+
+	uint32_t textureHandel_ = 0;
+
+	Model *model_ = nullptr;
+	Model *modelBlock_ = nullptr;
+	
+
+
+	ViewProjection viewProjection_;
+	WorldTransform worldTransform_;	
+
+	std::vector<std::vector<WorldTransform*>> worldTransformBlocks_;
+	
+	// デバッグカメラ
+	DebugCamera* debugCamera_ = nullptr;
+
+	// デバッグカメラ有効
+	bool isDebugCameraActive_ = false;
+	
 
 	/// <summary>
 	/// ゲームシーン用
