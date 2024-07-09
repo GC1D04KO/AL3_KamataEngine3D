@@ -1,7 +1,10 @@
 #include "GameScene.h"
 #include "TextureManager.h"
 #include <cassert>
+
 #include "Hako.h"
+
+#include"MapChipField.h"
 
 
 GameScene::GameScene() {}
@@ -22,6 +25,9 @@ GameScene::~GameScene() {
 
 	delete debugCamera_;
 	delete modelSkyedome_;
+
+	
+
 }
 
 void GameScene::Initialize() {
@@ -29,6 +35,7 @@ void GameScene::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
+
 	viewProjection_.Initialize();
 	worldTransform_.Initialize();
 
@@ -42,7 +49,16 @@ void GameScene::Initialize() {
 	skyedome_->Initialize(modelSkyedome_, &viewProjection_);
 
 
+	GenerateBlocks();
+
+	mapChipField_ = new MapChipField;
+
+	mapChipField_->LoadMapChipCsv("Resources/blocks.csv");
+
+
+
 	
+
 
 
 
@@ -95,6 +111,14 @@ void GameScene::Initialize() {
 
 	// デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);
+
+
+
+
+
+
+
+
 }
 
 void GameScene::Update() {

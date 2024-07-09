@@ -69,6 +69,7 @@
     <ClCompile Include="2d\ImGuiManager.cpp">
       <Filter>ソース ファイル\2d</Filter>
     </ClCompile>
+<<<<<<< Updated upstream
     <ClCompile Include="WorldTransformEX.cpp">
       <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
@@ -76,6 +77,9 @@
       <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
     <ClCompile Include="Skyedome.cpp">
+=======
+    <ClCompile Include="MapChipField.cpp">
+>>>>>>> Stashed changes
       <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
   </ItemGroup>
@@ -167,11 +171,16 @@
     <ClInclude Include="3d\ObjectColor.h">
       <Filter>ヘッダー ファイル\3d</Filter>
     </ClInclude>
+<<<<<<< Updated upstream
     <ClInclude Include="Hako.h">
       <Filter>ヘッダー ファイル\scene</Filter>
     </ClInclude>
     <ClInclude Include="Skyedome.h">
       <Filter>ヘッダー ファイル\scene</Filter>
+=======
+    <ClInclude Include="MapChipField.h">
+      <Filter>ソース ファイル\scene</Filter>
+>>>>>>> Stashed changes
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

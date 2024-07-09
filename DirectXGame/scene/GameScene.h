@@ -10,6 +10,8 @@
 #include<vector>
 #include"DebugCamera.h"
 #include "Skyedome.h"
+#include "MapChipField.h"
+
 
 /// <summary>
 /// ゲームシーン
@@ -75,6 +77,10 @@ private: // メンバ変数
 
 	// デバッグカメラ有効
 	bool isDebugCameraActive_ = false;
+
+	MapChipField* mapChipField_;
+
+	void GenerateBlocks();
 
 	/// <summary>
 	/// ゲームシーン用
