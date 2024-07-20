@@ -1,19 +1,121 @@
 #include "GameScene.h"
 #include "TextureManager.h"
 #include <cassert>
+#include <cstdint>
+#include"hako.h"
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() {}
+GameScene::~GameScene() {
+
+	delete modelPlayer_;
+	delete player_;
+	delete model_;
+	delete modelBlock_;
+	delete modelSkydome_;
+
+	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
+		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
+
+			delete worldTransformBlock;
+			worldTransformBlock = nullptr;
+		}
+	}
+
+	worldTransformBlocks_.clear();
+
+	delete debugCamera_;
+
+	delete mapChipField_;
+
+	delete cameraController;
+
+
+}
 
 void GameScene::Initialize() {
 
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
+
+
+	
+	// 3Dモデルの生成
+	modelPlayer_ = Model::CreateFromOBJ("player",true);
+	modelBlock_ = Model::CreateFromOBJ("block",true);
+	modelSkydome_ = Model::CreateFromOBJ("sphere", true);
+
+	// マップチップフィールドの生成
+	mapChipField_ = new MapChipField;
+	mapChipField_->LoadMapChipCsv("Resources/blocks.csv");
+
+	// 自キャラの生成
+	player_ = new Player();
+	// 自キャラの初期化
+	// 座標をマップチップ番号で指定
+	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(1, 18);
+	player_->Initialize(modelPlayer_, &viewProjection_, playerPosition);
+	player_->SetMapChipField(mapChipField_);
+
+	viewProjection_.Initialize();
+
+	// デバッグカメラの生成
+	debugCamera_ = new DebugCamera(WinApp::kWindowWidth, WinApp::kWindowHeight);
+
+	worldTransform_.Initialize();
+
+	GenerateBlocks();
+
+	cameraController = new CameraController;
+	cameraController->Initialize();
+	cameraController->SetTarget(player_);
+	cameraController->Reset();
+
+	CameraController::Rect cameraArea = {12.0f, 100 - 12.0f, 6.0f, 6.0f};
+	cameraController->SetMovableArea(cameraArea);
+	
 }
 
-void GameScene::Update() {}
+void GameScene::Update() {
+	worldTransform_.UpdateMatrix();
+
+	// 自キャラの更新
+	player_->Update();
+
+	cameraController->Update();
+
+#ifdef _DEBUG
+	if (input_->TriggerKey(DIK_SPACE)) {
+		// フラグをトグル
+		isDebugCameraActive_ = !isDebugCameraActive_;
+	}
+#endif
+	// カメラ処理
+	if (isDebugCameraActive_) {
+		// デバッグカメラの更新
+		debugCamera_->Update();
+		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
+		// ビュープロジェクション行列の転送
+		viewProjection_.TransferMatrix();
+	} else {
+		// ビュープロジェクション行列の更新と転送
+		viewProjection_.matView = cameraController->GetViewProjection().matView;
+		viewProjection_.matProjection = cameraController->GetViewProjection().matProjection;
+		// ビュープロジェクションの転送
+		viewProjection_.TransferMatrix();
+	}
+	// 縦横ブロック更新
+	for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
+		for (WorldTransform* worldTransformBlockYoko : worldTransformBlockTate) {
+			if (!worldTransformBlockYoko)
+				continue;
+
+			worldTransformBlockYoko->UpdateMatrix();
+		}
+	}
+}
 
 void GameScene::Draw() {
 
@@ -42,6 +144,23 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 
+	player_->Draw();
+
+	for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
+		for (WorldTransform* worldTransformBlockYoko : worldTransformBlockTate) {
+			if (!worldTransformBlockYoko)
+
+				continue;
+
+			modelBlock_->Draw(*worldTransformBlockYoko, viewProjection_);
+		}
+	}
+
+	modelSkydome_->Draw(worldTransform_, viewProjection_);
+
+
+
+
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
@@ -58,4 +177,30 @@ void GameScene::Draw() {
 	Sprite::PostDraw();
 
 #pragma endregion
+}
+void GameScene::GenerateBlocks() {
+
+	// 要素数
+	uint32_t numBlockVirtical = mapChipField_->GetNumBlockVirtical();
+	uint32_t numBlockHorizontal = mapChipField_->GetNumBlockHorizontal();
+
+	// 要素数を変更する
+	// 列数を設定 (縦方向のブロック数)
+	worldTransformBlocks_.resize(numBlockVirtical);
+	for (uint32_t i = 0; i < numBlockVirtical; ++i) {
+		// 1列の要素数を設定 (横方向のブロック数)
+		worldTransformBlocks_[i].resize(numBlockHorizontal);
+	}
+
+	// ブロックの生成
+	for (uint32_t i = 0; i < numBlockVirtical; ++i) {
+		for (uint32_t j = 0; j < numBlockHorizontal; ++j) {
+			if (mapChipField_->GetMapChipTypeByIndex(j, i) == MapChipType::kBlock) {
+				WorldTransform* worldTransform = new WorldTransform();
+				worldTransform->Initialize();
+				worldTransformBlocks_[i][j] = worldTransform;
+				worldTransformBlocks_[i][j]->translation_ = mapChipField_->GetMapChipPositionByIndex(j, i);
+			}
+		}
+	}
 }
