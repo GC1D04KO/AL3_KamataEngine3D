@@ -13,6 +13,7 @@
 #include "MapChipField.h"
 #include "CameraController.h"
 #include "Skydome.h"
+#include "Enmey.h"
 
 /// ゲームシーン
 /// </summary>
@@ -55,8 +56,10 @@ private: // メンバ変数
 	Model* modelBlock_ = nullptr;
 	Model* modelSkydome_ = nullptr;
 	Model* modelPlayer_ = nullptr;
+	Model* modelEnemy_ = nullptr;
 
 	Player* player_ = nullptr;
+	Enemy* enemy_ = nullptr;
 
 	ViewProjection viewProjection_;
 	WorldTransform worldTransform_;
