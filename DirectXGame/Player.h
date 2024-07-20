@@ -17,7 +17,6 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	//	void Initialize(Model* model, uint32_t textureHandle, ViewProjection* viewProjection);
 	void Initialize(const Vector3& position, ViewProjection* viewProjection);
 
 	/// <summary>
@@ -29,6 +28,10 @@ public:
 	/// 描画
 	/// </summary>
 	void Draw();
+
+	const WorldTransform& GetWorldTransform() const { return worldTransform_; }
+
+	const Vector3& GetVelocity() const { return velocity_; }
 
 private:
 	// ワールド変換データ

@@ -25,7 +25,7 @@ GameScene::~GameScene() {
 
 	delete mapChipField_;
 
-
+	delete cameraController;
 
 
 }
@@ -62,6 +62,13 @@ void GameScene::Initialize() {
 
 	GenerateBlocks();
 
+	cameraController = new CameraController;
+	cameraController->Initialize();
+	cameraController->SetTarget(player_);
+	cameraController->Reset();
+
+	CameraController::Rect cameraArea = {12.0f, 100 - 12.0f, 6.0f, 6.0f};
+	cameraController->SetMovableArea(cameraArea);
 
 	// デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);
@@ -69,9 +76,16 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 
+	#ifdef _DEBUG
+	if (input_->TriggerKey(DIK_SPACE)) {
+		if (isDebugCameraActive_ == true)
+			isDebugCameraActive_ = false;
+		else
+			isDebugCameraActive_ = true;
+	}
+#endif
 
-
-	player_->Update();
+	cameraController->Update();
 
 	// カメラ処理
 	if (isDebugCameraActive_) {
@@ -83,32 +97,34 @@ void GameScene::Update() {
 		viewProjection_.TransferMatrix();
 	} else {
 		// ビュープロジェクション行列の更新と転送
-		viewProjection_.UpdateMatrix();
+		//		viewProjection_.UpdateMatrix();
+		viewProjection_.matView = cameraController->GetViewProjection().matView;
+		viewProjection_.matProjection = cameraController->GetViewProjection().matProjection;
+		// ビュープロジェクションの転送
+		viewProjection_.TransferMatrix();
 	}
 
+	// 自キャラの更新
+	player_->Update();
 
 	// 縦横ブロック更新
 	for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlockYoko : worldTransformBlockTate) {
 			if (!worldTransformBlockYoko)
-
 				continue;
 
 			// アフィン変換行列の作成
-			worldTransformBlockYoko->UpdateMatrix();
+			//(MakeAffineMatrix：自分で作った数学系関数)
+			worldTransformBlockYoko->matWorld_ = MakeAffineMatrix(worldTransformBlockYoko->scale_, worldTransformBlockYoko->rotation_, worldTransformBlockYoko->translation_);
+
+			// 定数バッファに転送
+			worldTransformBlockYoko->TransferMatrix();
 		}
 	}
 
-#ifdef _DEBUG
-	if (input_->TriggerKey(DIK_SPACE)) {
-		if (isDebugCameraActive_ == true)
-			isDebugCameraActive_ = false;
-		else
-			isDebugCameraActive_ = true;
-	}
-#endif
+	
 
-
+	
 
 
 
