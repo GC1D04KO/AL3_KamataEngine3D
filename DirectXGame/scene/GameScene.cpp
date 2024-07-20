@@ -48,7 +48,10 @@ void GameScene::Initialize() {
 	worldTransform_.Initialize();
 
 	player_ = new Player();
-	player_->Initialize(model_, textureHandel_, &viewProjection_);
+	
+	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(2, 18);
+
+	player_->Initialize(playerPosition, &viewProjection_);
 
 	// デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);
@@ -56,8 +59,12 @@ void GameScene::Initialize() {
 	mapChipField_ = new MapChipField;
 	mapChipField_->LoadMapChipCsv("Resources/blocks.csv");
 
+
 	GenerateBlocks();
 
+
+	// デバッグカメラの生成
+	debugCamera_ = new DebugCamera(1280, 720);
 }
 
 void GameScene::Update() {
@@ -133,6 +140,8 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
+
+	player_->Draw();
 
 	for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlockYoko : worldTransformBlockTate) {

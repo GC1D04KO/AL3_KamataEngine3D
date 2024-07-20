@@ -71,6 +71,7 @@ private: // メンバ変数
 
 	void GenerateBlocks();
 
+
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
