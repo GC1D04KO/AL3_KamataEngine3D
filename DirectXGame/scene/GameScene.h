@@ -12,6 +12,7 @@
 #include "DebugCamera.h"
 #include "MapChipField.h"
 #include "CameraController.h"
+#include "Skydome.h"
 
 /// ゲームシーン
 /// </summary>
@@ -53,6 +54,7 @@ private: // メンバ変数
 	Model* model_ = nullptr;
 	Model* modelBlock_ = nullptr;
 	Model* modelSkydome_ = nullptr;
+	Model* modelPlayer_ = nullptr;
 
 	Player* player_ = nullptr;
 
@@ -69,8 +71,6 @@ private: // メンバ変数
 
 	// マップチップフィールド
 	MapChipField* mapChipField_;
-
-
 	CameraController* cameraController = nullptr;
 
 	void GenerateBlocks();
