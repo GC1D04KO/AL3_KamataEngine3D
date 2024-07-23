@@ -1,8 +1,9 @@
 #pragma once
+
+#include "AABB.h"
 #include "Model.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
-#include"AABB.h"
 
 class MapChipField;
 class Enemy;
@@ -57,6 +58,7 @@ public:
 	// getter
 	const WorldTransform& GetWorldTransform() const { return worldTransform_; }
 	const Vector3& GetVelocity() const { return velocity_; }
+	bool IsDead() const { return isDead_; };
 
 private:
 	static inline const float kAcceleration = 0.1f;
@@ -83,16 +85,14 @@ private:
 
 	Model* model_ = nullptr;
 	WorldTransform worldTransform_;
-
-
 	ViewProjection* viewProjection_ = nullptr;
 	Vector3 velocity_ = {};
 	bool onGround_ = true;
-
 	LRDirection lrDirection_ = LRDirection::kRight;
 	float turnFirstRotationY_ = 0.0f;
 	float turnTimer_ = 0.0f;
 	MapChipField* mapChipField_ = nullptr;
+	bool isDead_ = false;
 
 	void InputMove();
 	void CheckMapCollision(CollisionMapInfo& info);
