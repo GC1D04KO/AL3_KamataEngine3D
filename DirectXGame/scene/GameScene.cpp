@@ -3,35 +3,28 @@
 #include <cassert>
 #include <cstdint>
 #include"hako.h"
-
+#include"AABB.h"
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
 
-	delete enemy_;
-	delete modelPlayer_;
+  for (Enemy* enemy : enemies_) {
+		delete enemy;
+	}
 	delete player_;
-	delete model_;
-	delete modelBlock_;
-	delete modelSkydome_;
-	delete modelEnemy_;
-
 	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
-
 			delete worldTransformBlock;
 			worldTransformBlock = nullptr;
 		}
 	}
-
-	worldTransformBlocks_.clear();
-
+	delete modelEnemy_;
+	delete modelPlayer_;
+	delete modelBlock_;
 	delete debugCamera_;
-
+	delete modelSkydome_;
 	delete mapChipField_;
-
 	delete cameraController;
-
 
 }
 
@@ -82,16 +75,24 @@ void GameScene::Initialize() {
 	enemy_ = new Enemy();
 	Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(14, 18);
 	enemy_->Initialize(modelEnemy_, &viewProjection_, enemyPosition);
+
+
+	enemies_.push_back(enemy_);
+
 }
 
 void GameScene::Update() {
+
 	worldTransform_.UpdateMatrix();
 
 	// 自キャラの更新
 	player_->Update();
 
-	enemy_->Update();
+	
 
+	for (Enemy* enemy : enemies_) {
+		enemy->Update();
+	}
 	cameraController->Update();
 
 #ifdef _DEBUG
@@ -116,14 +117,15 @@ void GameScene::Update() {
 		viewProjection_.TransferMatrix();
 	}
 	// 縦横ブロック更新
-	for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
-		for (WorldTransform* worldTransformBlockYoko : worldTransformBlockTate) {
-			if (!worldTransformBlockYoko)
+	for (std::vector<WorldTransform*> worldTransformBlockLine : worldTransformBlocks_) {
+		for (WorldTransform*& worldTransformBlock : worldTransformBlockLine) {
+			if (!worldTransformBlock)
 				continue;
 
-			worldTransformBlockYoko->UpdateMatrix();
+			worldTransformBlock->UpdateMatrix();
 		}
 	}
+	CheckAllCollisions();
 }
 
 void GameScene::Draw() {
@@ -153,9 +155,7 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 
-	player_->Draw();
-	enemy_->Draw();
-
+	modelSkydome_->Draw(worldTransform_, viewProjection_);
 
 	for (std::vector<WorldTransform*> worldTransformBlockTate : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlockYoko : worldTransformBlockTate) {
@@ -167,9 +167,12 @@ void GameScene::Draw() {
 		}
 	}
 
-	modelSkydome_->Draw(worldTransform_, viewProjection_);
+	
 
+	player_->Draw();
+	//enemy_->Draw();
 
+	newEnemy_->Draw();
 
 
 	// 3Dオブジェクト描画後処理
@@ -214,4 +217,31 @@ void GameScene::GenerateBlocks() {
 			}
 		}
 	}
+}
+void GameScene::CheckAllCollisions() {
+
+	// 判定対象1と2座標
+	AABB aabb1, aabb2;
+
+#pragma region 
+	{
+		// 自キャラの座標
+		aabb1 = player_->GetAABB();
+
+		// 自キャラと擲弾全ての当たり判定
+		for (Enemy* enemy : enemies_) {
+			// 擲弾の座標
+			aabb2 = enemy->GetAABB();
+
+			// AABB同士の交差判定
+			if (IsCollision(aabb1, aabb2)) {
+
+				// 自キャラの衝突時コールバックを呼び出す
+				player_->OnCollision(enemy);
+				// 擲弾の衝突時コールバックを呼び出す
+				enemy->OnCollision(player_);
+			}
+		}
+	}
+#pragma endregion
 }

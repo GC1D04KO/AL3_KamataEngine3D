@@ -7,14 +7,14 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
-#include<vector>
+#include <vector>
 #include "Player.h"
 #include "DebugCamera.h"
 #include "MapChipField.h"
 #include "CameraController.h"
 #include "Skydome.h"
 #include "Enmey.h"
-
+#include "list"
 /// ゲームシーン
 /// </summary>
 class GameScene {
@@ -76,8 +76,13 @@ private: // メンバ変数
 	MapChipField* mapChipField_;
 	CameraController* cameraController = nullptr;
 
+
+	std::list<Enemy*> enemies_;
+	Enemy* newEnemy_ = nullptr;
+
 	void GenerateBlocks();
 
+	void CheckAllCollisions();
 
 	/// <summary>
 	/// ゲームシーン用

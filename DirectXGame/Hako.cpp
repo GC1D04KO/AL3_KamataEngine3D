@@ -1,5 +1,6 @@
-#include "GameScene.h"
 #include "Hako.h"
+
+#include "GameScene.h"
 #include <numbers>
 
 // アフィン変換行列の作成
@@ -35,10 +36,9 @@ Matrix4x4 MakeRotateYMatrix(float radian) {
 	return {cosTheta, 0.0f, -sinTheta, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, sinTheta, 0.0f, cosTheta, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 }
 Matrix4x4 MakeRotateZMatrix(float radian) {
-
 	float cosTheta = std::cos(radian);
 	float sinTheta = std::sin(radian);
-	return {cosTheta, 0.0f, -sinTheta, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, sinTheta, 0.0f, cosTheta, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+	return {cosTheta, sinTheta, 0.0f, 0.0f, -sinTheta, cosTheta, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 }
 
 Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
@@ -123,3 +123,21 @@ float EaseInOut(float x1, float x2, float t) {
 float Lerp(float x1, float x2, float t) { return (1.0f - t) * x1 + t * x2; }
 
 Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t) { return Vector3(Lerp(v1.x, v2.x, t), Lerp(v1.y, v2.y, t), Lerp(v1.z, v2.z, t)); }
+
+//Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix) {
+//	Vector3 result;
+//
+//	// w=1がデカルト座標系であるので(x,y,1)のベクトルとしてmatrixとの積をとる
+//	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + vector.z * matrix.m[2][0] + 1.0f * matrix.m[3][0];
+//	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + vector.z * matrix.m[2][1] + 1.0f * matrix.m[3][1];
+//	result.z = vector.x * matrix.m[0][2] + vector.y * matrix.m[1][2] + vector.z * matrix.m[2][2] + 1.0f * matrix.m[3][2];
+//
+//	float w = vector.x * matrix.m[0][3] + vector.y * matrix.m[1][3] + vector.z * matrix.m[2][3] + 1.0f * matrix.m[3][3];
+//
+//	// w=1がデカルト座標系であるので、w除算することで同次座標をデカルト座標に戻す
+//	result.x /= w;
+//	result.y /= w;
+//	result.z /= w;
+//
+//	return result;
+//}
