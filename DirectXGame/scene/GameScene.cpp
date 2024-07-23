@@ -170,9 +170,9 @@ void GameScene::Draw() {
 	
 
 	player_->Draw();
-	//enemy_->Draw();
+	enemy_->Draw();
 
-	newEnemy_->Draw();
+	/*newEnemy_->Draw();*/
 
 
 	// 3Dオブジェクト描画後処理
