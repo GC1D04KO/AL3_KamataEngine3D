@@ -16,6 +16,7 @@
 #include "Enmey.h"
 #include "list"
 #include"DeathParticles.h"
+
 /// ゲームシーン
 /// </summary>
 class GameScene {
@@ -46,11 +47,13 @@ public: // メンバ関数
 	/// </summary>
 	void Draw();
 
+bool IsFinished() const { return finished_; };
+
 private: // メンバ変数
 
 	enum class Phase {
 		kPlay,//ゲームプレイヤ
-		kDeath//デスの演出+-09
+		kDeath
 	};
 
 	DirectXCommon* dxCommon_ = nullptr;
@@ -80,13 +83,14 @@ private: // メンバ変数
 	// デバッグカメラ有効
 	bool isDebugCameraActive_ = false;
 	// マップチップフィールド
-	MapChipField* mapChipField_;
+	MapChipField* mapChipField_=nullptr;
 	CameraController* cameraController = nullptr;
 
 	std::list<Enemy*> enemies_;
 	Enemy* newEnemy_ = nullptr;
 
-	Phase phase_;
+	bool finished_ = false;
+	Phase phase_= Phase::kPlay;
 
 	DeathParticles* deathParticles_ = nullptr;
 
@@ -102,7 +106,4 @@ private: // メンバ変数
 
 	void CheckAllCollisions();
 
-	/// <summary>
-	/// ゲームシーン用
-	/// </summary>
 };

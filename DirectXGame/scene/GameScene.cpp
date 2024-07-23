@@ -76,16 +76,17 @@ void GameScene::Initialize() {
 	cameraController->SetMovableArea(cameraArea);
 
 	// 敵の生成
-	newEnemy_ = new Enemy();
+	Enemy* newEnemy = new Enemy();
 	Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(14, 18);
-	newEnemy_->Initialize(modelEnemy_, &viewProjection_, enemyPosition);
+	newEnemy->Initialize(modelEnemy_, &viewProjection_, enemyPosition);
 
-	enemies_.push_back(newEnemy_);
+	enemies_.push_back(newEnemy);
 
 	phase_ = Phase::kPlay;
 }
 
 void GameScene::Update() {
+	
 	ChangePhase();
 
 	switch (phase_) {
@@ -106,8 +107,11 @@ void GameScene::Update() {
 		UpdateBlocks();
 
 		CheckAllCollisions();
-
+		break;
 	case Phase::kDeath:
+		if (deathParticles_ && deathParticles_->IsFinished()) {
+			finished_ = true;
+		}
 		worldTransformSkydome_.UpdateMatrix();
 
 		for (Enemy* enemy : enemies_) {
@@ -122,7 +126,7 @@ void GameScene::Update() {
 		break;
 	}
 	
-	
+			
 }
 
 void GameScene::Draw() {
@@ -198,6 +202,25 @@ void GameScene::Draw() {
 #pragma endregion
 }
 
+void GameScene::ChangePhase() {
+	switch (phase_) {
+	case Phase::kPlay:
+		if (player_->IsDead()) {
+			// 死亡演出
+			phase_ = Phase::kDeath;
+
+			const Vector3& deathParticlesPosition = player_->GetWorldPosition();
+
+			deathParticles_ = new DeathParticles;
+
+			deathParticles_->Initialize(modelDeathParticle_, &viewProjection_, deathParticlesPosition);
+		}
+		break;
+	case Phase::kDeath:
+
+		break;
+	}
+}
 
 void GameScene::GenerateBlocks() {
 
@@ -226,25 +249,7 @@ void GameScene::GenerateBlocks() {
 	}
 }
 
-void GameScene::ChangePhase() {
-	switch (phase_) {
-	case Phase::kPlay:
-		if (player_->IsDead()) {
-			// 死亡演出
-			phase_ = Phase::kDeath;
 
-			const Vector3& deathParticlesPosition = player_->GetWorldPosition();
-
-			deathParticles_ = new DeathParticles;
-
-			deathParticles_->Initialize(modelDeathParticle_, &viewProjection_, deathParticlesPosition);
-		}
-		break;
-	case Phase::kDeath:
-
-		break;
-	}
-}
 
 
 void GameScene::UpdateCamera() {
